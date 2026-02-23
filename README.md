@@ -5,6 +5,7 @@ Kelly's personal reference for frontend development skills, project notes, lesso
 ## Master Reference
 
 - **[SKILLS.md](SKILLS.md)** - Everything in one place (Kelly's skills + Agnes's 20 operational skills)
+- **[WORKLOG.md](WORKLOG.md)** - Work log since Feb 16 (6 commits, 3 tickets: AW-317, AW-324, AW-298)
 
 ## Quick Links
 
