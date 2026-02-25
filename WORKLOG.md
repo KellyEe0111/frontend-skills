@@ -5,6 +5,28 @@ Kelly's activity log for the AWESOMEREE Web App. Entries are organized by work s
 **Session ID Convention**: Use `MMDD-N` format (e.g., `0219-1`) where MMDD is the date and N is the session number for that day.
 
 ---
+## AW-357 — Add duplicate submission prevention on Replacement & Review form
+  **Date:** 2026-02-25
+  **Branch:**
+  `fix-add-duplicate-submission-prevention-on-Replacement-&-Review-form-(AW-357)`
+
+  **Frontend:** Added `submitting` state on the Add New form — disables the Create button
+  and shows "Submitting…" while request is in-flight, preventing double-click submissions.
+
+  **Backend:** Added `checkRecentDuplicate()` function — checks if a record with the same
+  order_id was created within the last 60 seconds. Returns 409 Conflict if duplicate
+  detected, blocking repeated submissions.
+
+  **Logging gap:** Already implemented — Firebase auth headers (x-firebase-uid,
+  x-user-email, x-user-name) are passed from the form and captured in history_logs for both
+  create and update actions.
+
+  **Files changed:**
+  - `lib/replacement-review.ts` — added `checkRecentDuplicate()`
+  - `app/api/replacement-review1/route.ts` — added duplicate check before insert
+  - `components/replacement-review1/controls.tsx` — added `submitting` state to prevent
+  double-click
+
 
 ### Session 0220-1 (2026-02-20)
 
