@@ -5,6 +5,35 @@ Kelly's activity log for the AWESOMEREE Web App. Entries are organized by work s
 **Session ID Convention**: Use `MMDD-N` format (e.g., `0219-1`) where MMDD is the date and N is the session number for that day.
 
 ---
+
+### Session 0226-1 (2026-02-26)
+
+**GRBT-155 — Stock Adjustment Flow (Review & Close)**
+
+- **Context**: Stock adjustment bot (`stockID.py` on VM5) was 100% broken since Feb 11. Ticket was in TO REVIEW — Jana (Janarthan Nair) submitted fixes. Agnes/Claude Code reviewed.
+- **Workflow**: `/workflow-webapp` — Path B (dev-submitted work, review only)
+- **Work done**:
+  - Read full Jira ticket (description, 5 comments, 3 attachments)
+  - Dev compliance check: verified all 7 of Agnes's action items from Feb 17
+  - Code review of PR #22 (bot-scripts repo) — 903-line `stockID.py` Selenium scraper
+  - Security audit: PASS (no hardcoded creds, parameterized SQL, .env usage)
+  - Critical code review ("angry senior dev" style) — identified 12 issues including no session validation, no idempotency, fragile CSS selectors, self-merged PR
+  - Posted technical review comment on Jira (Step 8B) — compliance matrix, security review, root cause classification
+  - Created GitHub changelog `docs/changelog/GRBT-155.md` in bot-scripts repo (Step 11) — committed via PR (main is protected)
+  - Posted non-technical CS team comment on Jira (Step 12B) — plain language for Myrsya
+  - Transitioned ticket to DONE, ranked to top of Done column
+- **Root cause**: Configuration/Environment Issue + System/Code Defect — expired SiteGiant session, rotated DB password, retry bug in WHERE clause
+- **Verdict**: REVIEW PASSED — all 7 action items complete, bot operational at 67% (remainder explained)
+- **Out of scope**: Stock reservation automation (needs separate ticket)
+- **Tools used**: Claude-in-Chrome (Jira + GitHub), Jira REST API (comments, transitions, ranking), GitHub web UI
+
+**GRBT-194 — Stock Adjustment (Started, incomplete)**
+
+- **Context**: Follow-up to GRBT-155 — same bot, new issue. SiteGiant cookie consent banner overlaying confirm button.
+- **Status**: Step 1 (Study Jira Ticket) started — read ticket details, Jana's comment, PR #27 linked. Session ended before completing review.
+- **Will resume next session**
+
+---
 ## AW-357 — Add duplicate submission prevention on Replacement & Review form
   **Date:** 2026-02-25
   **Branch:**
