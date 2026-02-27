@@ -6,6 +6,35 @@ Kelly's activity log for the AWESOMEREE Web App. Entries are organized by work s
 
 ---
 
+### Session 0227-1 (2026-02-27)
+
+**Comp Analysis — Parent Category & Grouping Fixes (In Progress)**
+
+- **Context**: Shopee MY analytics table (`/analytics/table/shopee-my`) had multiple display bugs. Branch: `kelly-fixing-comp-analysis`
+- **Bug 1 — Parent category showing wrong value (FIXED)**:
+  - Product 25938069995 (das.nature2) showed VIP at parent level, but DB only has VVIP + NONE
+  - Root cause: code used `groupMetrics?.category ?? "VIP"` — pre-computed value from server enrichment that fell back to "VIP" when name-based lookup failed
+  - Fix: changed to `getHighestPriorityCategory(groupRows)` — computes live from actual variation data
+  - File: `components/Shopee-MY-History/grouped-rows.tsx` line 1156
+- **Bug 2 — Products with same product_id split into separate groups (FIXED)**:
+  - Product 22026149091 appeared as two parent groups with different names (seller renamed product)
+  - Root cause: `grouped-rows.tsx` had its own LOCAL `groupProducts()` that grouped by **product name**, separate from the shared version in `shopee-history-calculations.ts` that groups by **product_id**
+  - Fix: removed local `groupProducts` and imported the shared version that groups by product_id
+  - Also fixed duplicate React key error by using `group.productId ?? group.name` as key
+- **Bug 3 — Category sort mixing across pages (INVESTIGATING)**:
+  - Server paginates by `product_name` (GROUP BY product_name), client groups by `product_id`
+  - This mismatch causes categories to mix across pages (e.g., VVIP on page 1, then VVIP again on page 2)
+  - Products sharing same name but different product_ids get same sort values from enrichment
+  - Added live category computation for sort to fix within-page mixing
+  - Cross-page consistency still needs investigation — server vs client grouping mismatch is the root cause
+  - Discussion with Kelly: needs server-side change to GROUP BY product_id for true global sort
+- **DB queries run**: Verified `sheet_name` values for products 25938069995 (VVIP+NONE), 24924470455 (LINKS_INPUT+VIP+NONE), 26719140723 (LINKS_INPUT+NONE)
+- **Files changed**: `components/Shopee-MY-History/grouped-rows.tsx`, `lib/shared/shopee-history-calculations.ts` (debug log added then removed)
+- **Tools used**: MySQL direct query, Chrome browser automation, TypeScript compiler
+- **Status**: Bugs 1 & 2 fixed. Bug 3 (cross-page sort) needs further discussion — fundamental server/client grouping mismatch
+
+---
+
 ### Session 0226-1 (2026-02-26)
 
 **GRBT-155 — Stock Adjustment Flow (Review & Close)**

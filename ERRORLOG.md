@@ -8,6 +8,35 @@ Errors encountered during development and how they were resolved. Prevents repea
 
 ---
 
+### Session 0227-1 (2026-02-27)
+
+- **Error**: Parent category badge showing "VIP" instead of "VVIP" for products that only have VVIP + NONE in database
+- **Discovered by**: Kelly (visual check on analytics table)
+- **Root cause**: Code used `groupMetrics?.category ?? "VIP"` — server enrichment stores metrics in Map keyed by product name, lookup uses each product's own name. When names mismatch (or multiple product_ids share same name), lookup returns undefined, falls back to "VIP"
+- **Resolution**: Changed to `getHighestPriorityCategory(groupRows)` — computes parent category live from actual variation data
+- **Prevention**: Avoid relying on name-based Map lookups for data keyed by product_id. Compute values from source data where possible.
+- **Status**: RESOLVED
+
+---
+
+- **Error**: Products with same product_id but different names (seller renamed) showing as separate parent groups
+- **Discovered by**: Kelly (visual check — product 22026149091 appeared as two groups)
+- **Root cause**: `grouped-rows.tsx` had its own LOCAL `groupProducts()` function that grouped by product **name** (`byName` Map). The shared version in `shopee-history-calculations.ts` groups by product_id extracted from URL. The component used the local (wrong) version.
+- **Resolution**: Removed local `groupProducts` from `grouped-rows.tsx`, imported the shared version that groups by product_id. Also fixed duplicate React key error by using `group.productId ?? group.name` as key.
+- **Prevention**: Don't duplicate shared functions locally in components. Always import from the shared module. Search codebase for duplicate function names when fixing bugs.
+- **Status**: RESOLVED
+
+---
+
+- **Error**: Category sort mixing across pages — VVIP on page 1, then VVIP again on page 2 instead of continuous sort
+- **Discovered by**: Kelly (visual check — changed to 100 rows per page, compared page 1 vs page 2)
+- **Root cause**: Server paginates by `GROUP BY product_name` and sorts by `MAX(sheet_name priority)`. Client groups by `product_id`. Different product_ids sharing the same product_name get the same server sort values. Also, server uses date-filtered data for sorting while client sees all dates (Stage 2 is date-free). This mismatch means server and client compute different category priorities for some products.
+- **Resolution**: PARTIALLY FIXED — added live category computation per product_id group for within-page sort accuracy. Cross-page consistency requires server-side change to paginate by product_id instead of product_name.
+- **Prevention**: When changing client-side grouping strategy (name → product_id), ensure server-side pagination/sorting uses the same grouping key.
+- **Status**: UNRESOLVED (cross-page mixing — needs server-side GROUP BY product_id)
+
+---
+
 ### Session 0226-1 (2026-02-26)
 
 - **Error**: Claude-in-Chrome browser extension repeatedly disconnecting during GRBT-155 review workflow
